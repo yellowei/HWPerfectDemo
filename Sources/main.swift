@@ -25,7 +25,7 @@ let server = HTTPServer()
 
 server.serverPort = 8080
 server.serverName = "localhost"
-server.documentRoot = "/Users/yellowei/Documents/PerfectTemplate-master/webroot"
+server.documentRoot = "./webroot"
 
 
 var routes = Routes()
