@@ -1141,6 +1141,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		BC7E06181EF9747C00C13576 /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
+		BC7E06191EF9747C00C13576 /* login.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = login.html; sourceTree = "<group>"; };
 		BCA69E591EF91CFA00C313C1 /* BaseHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseHandler.swift; sourceTree = "<group>"; };
 		OBJ_100 /* a_utf8.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = a_utf8.c; sourceTree = "<group>"; };
 		OBJ_101 /* a_verify.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = a_verify.c; sourceTree = "<group>"; };
@@ -1152,7 +1154,6 @@
 		OBJ_107 /* aes_ige.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = aes_ige.c; sourceTree = "<group>"; };
 		OBJ_108 /* aes_misc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = aes_misc.c; sourceTree = "<group>"; };
 		OBJ_109 /* aes_ofb.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = aes_ofb.c; sourceTree = "<group>"; };
-		OBJ_11 /* webroot */ = {isa = PBXFileReference; lastKnownFileType = folder; path = webroot; sourceTree = SOURCE_ROOT; };
 		OBJ_110 /* aes_wrap.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = aes_wrap.c; sourceTree = "<group>"; };
 		OBJ_111 /* ameth_lib.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ameth_lib.c; sourceTree = "<group>"; };
 		OBJ_112 /* asn1_err.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = asn1_err.c; sourceTree = "<group>"; };
@@ -2038,6 +2039,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BC7E06171EF9747C00C13576 /* webroot */ = {
+			isa = PBXGroup;
+			children = (
+				BC7E06181EF9747C00C13576 /* index.html */,
+				BC7E06191EF9747C00C13576 /* login.html */,
+			);
+			name = webroot;
+			path = "../../../Library/Developer/Xcode/DerivedData/HWPerfectDemo-cireyzuxahjaggbkunboirxtyguu/Build/Products/Debug/webroot";
+			sourceTree = "<group>";
+		};
 		BCA69E561EF91CA700C313C1 /* Handler */ = {
 			isa = PBXGroup;
 			children = (
@@ -2161,9 +2172,9 @@
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
+				BC7E06171EF9747C00C13576 /* webroot */,
 				OBJ_7 /* Sources */,
 				OBJ_10 /* Tests */,
-				OBJ_11 /* webroot */,
 				OBJ_12 /* Dependencies */,
 				OBJ_779 /* Products */,
 			);

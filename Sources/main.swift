@@ -114,6 +114,8 @@ func mustacheHandler(data: [String: Any]) throws -> RequestHandler {
 
 let port1 = 8080, port2 = 8181
 
+HTTPServer().documentRoot = "/Users/yellowei/Documents/MyPods/HWPerfectDemo/webroot"
+
 let confData = [
     "servers": [
         // Configuration data for one server which:
@@ -126,7 +128,7 @@ let confData = [
             "port":port1,
             "routes":[
                 ["method":"get", "uri":"/", "handler":normalHandler,
-                 "documentRoot":"/Users/yellowei/Documents/GitHub/HWPerfectDemo/webroot",
+                 "documentRoot":"/Users/yellowei/Documents/MyPods/HWPerfectDemo/webroot",
                  "allowResponseFilters":true],
                 ["method":"post", "uri":"/login", "handler":normalHandler]
             ],
