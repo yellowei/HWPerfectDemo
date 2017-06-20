@@ -20,74 +20,142 @@
 import PerfectLib
 import PerfectHTTP
 import PerfectHTTPServer
+import PerfectMustache
 
-let server = HTTPServer()
-
-server.serverPort = 8080
-server.serverName = "localhost"
-server.documentRoot = "./webroot"
+//MARK: - request handler.
+// This 'handler' function can be referenced directly in the configuration below.
 
 
-var routes = Routes()
-
-
-//MARK: -静态路由
-routes.add(method: .get, uri: "/login") { (request, response) in
-    // Respond with a simple message.
-    response.setHeader(.contentType, value: "text/html")
-    response.appendBody(string: "<html><title>Hello, Login!</title><body>Hello, Login!</body></html>")
-    // Ensure that response.completed() is called when your processing is done.
-    response.completed()
+/// 一般处理句柄
+///
+/// - Parameter data: 路由参数
+/// - Returns: 处理请求的回调闭包
+/// - Throws: 异常处理
+func normalHandler(data: [String:Any]) throws -> RequestHandler {
+    
+    guard let uri = data["uri"] as? String else {
+        return try errorHandler(data: data)
+    }
+    
+    switch uri {
+        
+    case "/login":
+        return try loginHandler(data: data)
+    case "/":
+        return try mustacheHandler(data: data)
+    default:
+        return try errorHandler(data: data)
+        
+    }
 }
 
-routes.add(method: .get, uri: "/hello") { (request, response) in
-    // Respond with a simple message.
-    response.setHeader(.contentType, value: "text/html")
-    response.appendBody(string: "<html><title>Hello, world!</title><body>Hello, world!</body></html>")
-    // Ensure that response.completed() is called when your processing is done.
-    response.completed()
+/// 错误处理句柄
+///
+/// - Parameter data: 路由参数
+/// - Returns: 处理请求的回调闭包
+/// - Throws: 异常处理
+func errorHandler(data: [String: Any]) throws -> RequestHandler {
+    
+    return {(request, response)->() in
+        response.appendBody(string: "请求处理错误")
+        response.completed()
+    }
+}
+
+/// 登录处理句柄
+///
+/// - Parameter data: 路由参数
+/// - Returns: 处理请求的回调闭包
+/// - Throws: 异常处理
+func loginHandler(data: [String:Any]) throws -> RequestHandler {
+    return { request, response in
+        // Respond with a simple message.
+        guard let userName = request.param(name: "userName") else {
+            return
+        }
+        
+        guard let password = request.param(name: "password") else {
+            return
+        }
+        
+        let responsDic: [String : Any] = ["response":["userName":userName,
+                                                      "password":password],
+                                          "result":"SUCCESS",
+                                          "resultMessage":"请求成功"]
+        
+        do{
+            let json = try responsDic.jsonEncodedString()
+            response.setBody(string: json)
+            
+        }catch{
+            response.setBody(string: "json转换错误")
+        }
+        
+        response.completed()
+    }
 }
 
 
-routes.add(method: .get, uri: "/hello") { (request, response) in
-    // Respond with a simple message.
-    response.setHeader(.contentType, value: "text/html")
-    response.appendBody(string: "<html><title>Hello, world!</title><body>Hello, world!</body></html>")
-    // Ensure that response.completed() is called when your processing is done.
-    response.completed()
-}
- 
-//MARK: - 动态路由
-let valueKey = "key"
-routes.add(method: .get, uri: "/path1/{\(valueKey)}") { (request, response) in
-    // Respond with a simple message.
-    response.setHeader(.contentType, value: "text/html")
-    response.appendBody(string: "该路由中的路由变量为: \(String(describing: request.urlVariables[valueKey]))")
-    // Ensure that response.completed() is called when your processing is done.
-    response.completed()
-}
 
-//MARK: - 路由通配符
-routes.add(method: .get, uri: "/path2/*/detail") { (request, response) in
-    response.appendBody(string: "通配符路由: \(request.path)")
-    response.completed()
-}
-
-//MARK: -结尾通配符
-routes.add(method: .get, uri: "/path3/**") { (request, response) in
-    response.appendBody(string: "\(String(describing: request.urlVariables[routeTrailingWildcardKey]))")
-    response.completed()
+func mustacheHandler(data: [String: Any]) throws -> RequestHandler {
+    
+    return {(request, response)->() in
+        
+        let webRoot = request.documentRoot
+        mustacheRequest(request: request, response: response, handler: BaseHandler(), templatePath: webRoot + "/index.html")
+    }
 }
 
 
 
+//MARK: - Configuration data for two servers.
+// This configuration shows how to launch one or more servers
+// using a configuration dictionary.
 
-//MARK: - 设置路由并启动server
-server.addRoutes(routes)
+let port1 = 8080, port2 = 8181
 
-do{
-    try server.start()
-}catch{
-    fatalError("\(error)")
+let confData = [
+    "servers": [
+        // Configuration data for one server which:
+        //	* Serves the hello world message at <host>:<port>/
+        //	* Serves static files out of the "./webroot"
+        //		directory (which must be located in the current working directory).
+        //	* Performs content compression on outgoing data when appropriate.
+        [
+            "name":"localhost",
+            "port":port1,
+            "routes":[
+                ["method":"get", "uri":"/", "handler":normalHandler,
+                 "documentRoot":"/Users/yellowei/Documents/GitHub/HWPerfectDemo/webroot",
+                 "allowResponseFilters":true],
+                ["method":"post", "uri":"/login", "handler":normalHandler]
+            ],
+            "filters":[
+                [
+                    "type":"response",
+                    "priority":"high",
+                    "name":PerfectHTTPServer.HTTPFilter.contentCompression,
+                    ]
+            ]
+        ],
+        // Configuration data for another server which:
+        //	* Redirects all traffic back to the first server.
+        [
+            "name":"localhost",
+            "port":port2,
+            "routes":[
+                ["method":"get", "uri":"/**", "handler":PerfectHTTPServer.HTTPHandler.redirect,
+                 "base":"http://localhost:\(port1)"]
+            ]
+        ]
+    ]
+]
+
+
+do {
+    // Launch the servers based on the configuration data.
+    try HTTPServer.launch(configurationData: confData)
+} catch {
+    fatalError("\(error)") // fatal error launching one of the servers
 }
 
